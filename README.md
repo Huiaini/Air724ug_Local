@@ -91,6 +91,10 @@ node cloudflare-config-generator/smoke-test.js
 - Legacy Lua 模式兼容性
 - 关键字段是否正确进入导出载荷
 
+## 鸣谢
+
+感谢 [TheHot](https://github.com/TheHot/) 公开了相关思路和脚本，本仓库的整理、适配与扩展工作是在这些公开资料的基础上继续推进的。
+
 ## 说明
 
 - 本仓库已移除本地 Luatools、大日志、临时构建目录等非源码内容
