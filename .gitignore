@@ -5,5 +5,7 @@
 !LuaFormatter.config
 !script/
 !script/**
+!driver/
+!driver/**
 !cloudflare-config-generator/
 !cloudflare-config-generator/**
