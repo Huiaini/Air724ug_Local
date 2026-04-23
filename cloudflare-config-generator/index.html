@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Air724UG 客户配置生成器</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Cloudflare Pages Ready</p>
+        <h1>Air724UG 客户配置交付台</h1>
+        <p class="hero-text">
+          在浏览器本地生成客户专属 <code>config.bin</code>。默认导出 JSON 安全配置，
+          设备端会优先白名单解析，必要时再回退旧版 Lua 兼容模式。
+        </p>
+        <div class="hero-actions">
+          <a class="ghost-link" href="#templates">选择模板</a>
+          <a class="ghost-link" href="#output">查看输出</a>
+        </div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-card-line">
+          <span>导出模式</span>
+          <strong id="summaryExportMode">JSON 安全载荷</strong>
+        </div>
+        <div class="hero-card-line">
+          <span>兼容派生 key</span>
+          <strong id="derivedKeyPreview">e7b8b84a82e646d3</strong>
+        </div>
+        <div class="hero-card-line">
+          <span>客户标识</span>
+          <strong id="summaryCustomer">未命名客户</strong>
+        </div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="panel form-panel">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">Delivery Settings</p>
+            <h2>交付设置</h2>
+          </div>
+          <p>所有配置仅在本机浏览器中处理，不会上传到服务器。</p>
+        </div>
+
+        <div class="notice notice-info">
+          <strong>新版设备端协议</strong>
+          <span>
+            <code>config.bin</code> 仍使用 AES-ECB ZeroPadding + Base64 兼容加密，
+            但密文内容默认改为 JSON；设备端先解析 JSON 白名单字段，再按开关决定是否允许旧版 <code>loadstring</code>。
+          </span>
+        </div>
+
+        <div class="grid two-col">
+          <label class="field">
+            <span>预设名称</span>
+            <input id="presetName" type="text" placeholder="例如：客户A-上海-标准版">
+          </label>
+          <label class="field">
+            <span>客户标识</span>
+            <input id="customerName" type="text" placeholder="例如：上海客户A">
+          </label>
+        </div>
+
+        <div class="grid three-col">
+          <label class="field">
+            <span>config.bin 导出格式</span>
+            <select id="exportFormat">
+              <option value="json">JSON 安全配置（推荐）</option>
+              <option value="legacy-lua">旧版 Lua 脚本兼容</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>config.bin 密钥</span>
+            <input id="configKey" type="text" value="jocry" placeholder="默认 jocry">
+          </label>
+          <label class="field checkbox-field">
+            <input id="allowLegacyLua" type="checkbox" checked>
+            <span>设备端允许旧版 Lua 回退</span>
+          </label>
+        </div>
+
+        <section class="form-block" id="templates">
+          <div class="block-head">
+            <div>
+              <p class="section-kicker">Template Center</p>
+              <h3>客户模板中心</h3>
+            </div>
+            <p>一键套用常见交付场景，再按客户信息微调。</p>
+          </div>
+          <div class="template-grid" id="templateList"></div>
+        </section>
+
+        <section class="form-block">
+          <div class="block-head">
+            <div>
+              <p class="section-kicker">Runtime</p>
+              <h3>设备行为</h3>
+            </div>
+          </div>
+
+          <div class="grid two-col">
+            <label class="field">
+              <span>开机通知</span>
+              <select id="bootNotify">
+                <option value="true">开启</option>
+                <option value="false">关闭</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>开机通知后缀</span>
+              <select id="bootNotifySuffix">
+                <option value="reason_zh">中文原因</option>
+                <option value="reason">数字原因码</option>
+                <option value="none">不追加后缀</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="grid three-col">
+            <label class="field">
+              <span>扬声器音量</span>
+              <input id="audioVolume" type="number" min="0" max="7" value="1">
+            </label>
+            <label class="field">
+              <span>通话音量</span>
+              <input id="callVolume" type="number" min="0" max="7" value="0">
+            </label>
+            <label class="field">
+              <span>麦克风音量</span>
+              <input id="micVolume" type="number" min="0" max="7" value="7">
+            </label>
+          </div>
+
+          <div class="grid three-col">
+            <label class="field">
+              <span>来电动作</span>
+              <select id="callInAction">
+                <option value="0">0 无操作</option>
+                <option value="1">1 自动接听</option>
+                <option value="2">2 挂断</option>
+                <option value="3">3 自动接听后挂断</option>
+                <option value="4" selected>4 等待30秒后自动接听</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>短信播报</span>
+              <select id="smsTts">
+                <option value="0">0 关闭</option>
+                <option value="1">1 仅验证码</option>
+                <option value="2">2 全部短信</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>查询流量间隔(ms)</span>
+              <input id="queryTrafficInterval" type="number" min="0" step="60000" value="0">
+            </label>
+          </div>
+
+          <div class="grid two-col">
+            <label class="field checkbox-field">
+              <input id="rndisEnable" type="checkbox">
+              <span>启用 RNDIS 网卡</span>
+            </label>
+            <label class="field checkbox-field">
+              <input id="ledEnable" type="checkbox" checked>
+              <span>启用状态灯</span>
+            </label>
+          </div>
+
+          <div class="grid three-col">
+            <label class="field">
+              <span>SIM PIN</span>
+              <input id="pinCode" type="text" placeholder="留空表示不写入">
+            </label>
+            <label class="field">
+              <span>本机号码(可选)</span>
+              <input id="number" type="text" placeholder="查询不到本机号时作为回退">
+            </label>
+            <label class="field">
+              <span>通话接通 TTS 文案</span>
+              <input id="ttsText" type="text" placeholder="留空则使用默认音频">
+            </label>
+          </div>
+        </section>
+
+        <section class="form-block">
+          <div class="block-head">
+            <div>
+              <p class="section-kicker">Notify Channels</p>
+              <h3>通知通道</h3>
+            </div>
+          </div>
+
+          <div class="grid three-col">
+            <label class="field">
+              <span>通知头</span>
+              <input id="notifyHeader" type="text" value="#{tail} ">
+            </label>
+            <label class="field">
+              <span>号码末尾位数</span>
+              <input id="notifyHeaderTailLen" type="number" min="0" value="4">
+            </label>
+            <label class="field">
+              <span>兜底通知头</span>
+              <input id="notifyHeaderFallback" type="text" value="#0000 ">
+            </label>
+          </div>
+
+          <div class="grid two-col">
+            <label class="field checkbox-field">
+              <input id="notifyAppendMoreInfo" type="checkbox" checked>
+              <span>通知附加更多设备信息</span>
+            </label>
+            <label class="field">
+              <span>通知最大重发次数</span>
+              <input id="notifyRetryMax" type="number" min="0" value="10">
+            </label>
+          </div>
+
+          <div class="field">
+            <span>通知类型</span>
+            <div class="chip-grid" id="notifyTypes">
+              <label class="chip"><input type="checkbox" value="bark" checked><span>Bark</span></label>
+              <label class="chip"><input type="checkbox" value="custom_post"><span>Custom POST</span></label>
+              <label class="chip"><input type="checkbox" value="telegram"><span>Telegram</span></label>
+              <label class="chip"><input type="checkbox" value="pushdeer"><span>PushDeer</span></label>
+              <label class="chip"><input type="checkbox" value="dingtalk"><span>DingTalk</span></label>
+              <label class="chip"><input type="checkbox" value="feishu"><span>Feishu</span></label>
+              <label class="chip"><input type="checkbox" value="wecom"><span>WeCom</span></label>
+              <label class="chip"><input type="checkbox" value="pushover"><span>Pushover</span></label>
+              <label class="chip"><input type="checkbox" value="inotify"><span>Inotify</span></label>
+              <label class="chip"><input type="checkbox" value="next-smtp-proxy"><span>SMTP Proxy</span></label>
+              <label class="chip"><input type="checkbox" value="gotify"><span>Gotify</span></label>
+              <label class="chip"><input type="checkbox" value="serverchan"><span>ServerChan</span></label>
+            </div>
+          </div>
+
+          <div class="grid two-col">
+            <label class="field">
+              <span>Bark API</span>
+              <input id="barkApi" type="text" value="https://api.day.app">
+            </label>
+            <label class="field">
+              <span>Bark Key</span>
+              <input id="barkKey" type="text" placeholder="客户 Bark key">
+            </label>
+          </div>
+
+          <div class="grid two-col">
+            <label class="field">
+              <span>Custom POST URL</span>
+              <input id="customPostUrl" type="text" placeholder="https://example.com/hook">
+            </label>
+            <label class="field">
+              <span>Custom POST Content-Type</span>
+              <select id="customPostContentType">
+                <option value="">留空</option>
+                <option value="application/json">application/json</option>
+                <option value="application/x-www-form-urlencoded">application/x-www-form-urlencoded</option>
+              </select>
+            </label>
+          </div>
+
+          <label class="field">
+            <span>Custom POST Body Table(JSON 对象)</span>
+            <textarea id="customPostBodyTable" rows="4" placeholder='例如：{"title":"Air724UG","desp":"{msg}"}'></textarea>
+          </label>
+
+          <div class="grid two-col">
+            <label class="field">
+              <span>Telegram API</span>
+              <input id="telegramApi" type="text" placeholder="https://api.telegram.org/bot{token}/sendMessage">
+            </label>
+            <label class="field">
+              <span>Telegram Chat ID</span>
+              <input id="telegramChatId" type="text">
+            </label>
+          </div>
+
+          <div class="grid two-col">
+            <label class="field">
+              <span>PushDeer API</span>
+              <input id="pushdeerApi" type="text" placeholder="https://api2.pushdeer.com/message/push">
+            </label>
+            <label class="field">
+              <span>PushDeer Key</span>
+              <input id="pushdeerKey" type="text">
+            </label>
+          </div>
+
+          <div class="grid two-col">
+            <label class="field">
+              <span>DingTalk Webhook</span>
+              <input id="dingtalkWebhook" type="text">
+            </label>
+            <label class="field">
+              <span>DingTalk Secret</span>
+              <input id="dingtalkSecret" type="text">
+            </label>
+          </div>
+
+          <div class="grid two-col">
+            <label class="field">
+              <span>Feishu Webhook</span>
+              <input id="feishuWebhook" type="text">
+            </label>
+            <label class="field">
+              <span>WeCom Webhook</span>
+              <input id="wecomWebhook" type="text">
+            </label>
+          </div>
+
+          <div class="grid two-col">
+            <label class="field">
+              <span>Gotify API</span>
+              <input id="gotifyApi" type="text">
+            </label>
+            <label class="field">
+              <span>Gotify Token</span>
+              <input id="gotifyToken" type="text">
+            </label>
+          </div>
+
+          <div class="grid two-col">
+            <label class="field">
+              <span>Gotify Title</span>
+              <input id="gotifyTitle" type="text" value="Air724UG">
+            </label>
+            <label class="field">
+              <span>Gotify Priority</span>
+              <input id="gotifyPriority" type="number" value="8">
+            </label>
+          </div>
+
+          <div class="grid two-col">
+            <label class="field">
+              <span>ServerChan API</span>
+              <input id="serverchanApi" type="text">
+            </label>
+            <label class="field">
+              <span>ServerChan Title</span>
+              <input id="serverchanTitle" type="text" value="来自 Air724UG 的通知">
+            </label>
+          </div>
+
+          <details class="advanced">
+            <summary>高级通道：Pushover / Inotify / SMTP Proxy</summary>
+            <div class="grid two-col">
+              <label class="field">
+                <span>Pushover API Token</span>
+                <input id="pushoverApiToken" type="text">
+              </label>
+              <label class="field">
+                <span>Pushover User Key</span>
+                <input id="pushoverUserKey" type="text">
+              </label>
+            </div>
+            <label class="field">
+              <span>Inotify API</span>
+              <input id="inotifyApi" type="text" placeholder="https://push.luatos.org/xxx.send">
+            </label>
+            <div class="grid two-col">
+              <label class="field">
+                <span>SMTP Proxy API</span>
+                <input id="nextSmtpProxyApi" type="text">
+              </label>
+              <label class="field">
+                <span>SMTP Proxy User</span>
+                <input id="nextSmtpProxyUser" type="text">
+              </label>
+            </div>
+            <div class="grid two-col">
+              <label class="field">
+                <span>SMTP Proxy Password</span>
+                <input id="nextSmtpProxyPassword" type="text">
+              </label>
+              <label class="field">
+                <span>SMTP Proxy Host</span>
+                <input id="nextSmtpProxyHost" type="text">
+              </label>
+            </div>
+            <div class="grid three-col">
+              <label class="field">
+                <span>SMTP Proxy Port</span>
+                <input id="nextSmtpProxyPort" type="number" value="587">
+              </label>
+              <label class="field">
+                <span>发件人名称</span>
+                <input id="nextSmtpProxyFormName" type="text" value="Air724UG">
+              </label>
+              <label class="field">
+                <span>收件邮箱</span>
+                <input id="nextSmtpProxyToEmail" type="text">
+              </label>
+            </div>
+            <label class="field">
+              <span>邮件主题</span>
+              <input id="nextSmtpProxySubject" type="text" value="来自 Air724UG 的通知">
+            </label>
+          </details>
+        </section>
+
+        <section class="form-block">
+          <div class="block-head">
+            <div>
+              <p class="section-kicker">SMS & Record</p>
+              <h3>短信控制与录音</h3>
+            </div>
+          </div>
+
+          <div class="grid two-col">
+            <label class="field">
+              <span>短信控制白名单</span>
+              <textarea id="smsWhitelist" rows="4" placeholder="一行一个号码，或使用逗号分隔"></textarea>
+            </label>
+            <label class="field">
+              <span>录音上传 URL</span>
+              <textarea id="uploadUrl" rows="4" placeholder="留空表示不启用录音上传"></textarea>
+            </label>
+          </div>
+
+          <label class="field">
+            <span>Legacy 追加 Lua（仅旧版 Lua 导出模式生效）</span>
+            <textarea id="extraLua" rows="5" placeholder='例如：NUMBER = "13800138000"'></textarea>
+          </label>
+        </section>
+
+        <div class="action-row">
+          <button id="renderBtn" class="btn btn-primary" type="button">生成预览</button>
+          <button id="downloadBinBtn" class="btn btn-accent" type="button">导出 config.bin</button>
+          <button id="downloadLuaBtn" class="btn" type="button">导出 config.lua</button>
+          <button id="savePresetBtn" class="btn" type="button">保存浏览器预设</button>
+        </div>
+
+        <div class="action-row compact">
+          <label class="field field-inline">
+            <span>读取预设</span>
+            <select id="presetPicker"></select>
+          </label>
+          <button id="loadPresetBtn" class="btn" type="button">载入</button>
+          <button id="deletePresetBtn" class="btn btn-danger" type="button">删除预设</button>
+          <button id="exportPresetBtn" class="btn" type="button">导出预设 JSON</button>
+          <label class="btn file-btn">
+            导入预设 JSON
+            <input id="importPresetInput" type="file" accept="application/json">
+          </label>
+        </div>
+      </section>
+
+      <aside class="panel preview-panel" id="output">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">Generated Output</p>
+            <h2>输出结果</h2>
+          </div>
+          <p id="summaryPayloadMode">JSON 安全配置</p>
+        </div>
+
+        <div class="meta-list">
+          <div>
+            <span>设备读取路径</span>
+            <strong>/usbmsc0/config.bin</strong>
+          </div>
+          <div>
+            <span>加密兼容性</span>
+            <strong>AES-ECB + Base64</strong>
+          </div>
+          <div>
+            <span>交付建议</span>
+            <strong>只交付 config.bin</strong>
+          </div>
+        </div>
+
+        <div class="notice notice-warn">
+          <strong>烧录前提醒</strong>
+          <span>
+            如果你把 <code>configKey</code> 改成客户专属值，需要先把同样的
+            <code>CONFIG_BIN_KEY</code> 烧录进设备端 <code>script/config.lua</code>。
+          </span>
+        </div>
+
+        <label class="field">
+          <span>config.bin 解密后的载荷预览</span>
+          <textarea id="payloadPreview" rows="18" spellcheck="false"></textarea>
+        </label>
+
+        <label class="field">
+          <span>config.lua 预览</span>
+          <textarea id="luaPreview" rows="18" spellcheck="false"></textarea>
+        </label>
+
+        <label class="field">
+          <span>状态输出</span>
+          <textarea id="statusOutput" rows="8" readonly></textarea>
+        </label>
+      </aside>
+    </main>
+  </div>
+
+  <script src="./vendor/crypto-js.min.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

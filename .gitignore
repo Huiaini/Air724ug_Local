@@ -1,0 +1,9 @@
+*
+!.gitignore
+!LICENSE
+!README.md
+!LuaFormatter.config
+!script/
+!script/**
+!cloudflare-config-generator/
+!cloudflare-config-generator/**
