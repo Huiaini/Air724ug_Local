@@ -123,8 +123,8 @@ const defaultState = {
   notifyHeaderFallback: "#0000 ",
   notifyAppendMoreInfo: true,
   notifyRetryMax: 10,
-  notifyTypes: ["bark"],
-  barkApi: "https://api.day.app",
+  notifyTypes: [],
+  barkApi: "",
   barkKey: "",
   customPostUrl: "",
   customPostContentType: "",
@@ -164,7 +164,7 @@ const templateLibrary = [
     id: "bark-standard",
     name: "Bark 标准交付",
     tag: "iPhone 通知",
-    description: "保持默认行为，适合只使用 Bark 推送的个人客户。",
+    description: "仅在需要 Bark 推送时手动套用，适合只使用 Bark 的个人客户。",
     patch: {
       presetName: "Bark 标准交付",
       notifyTypes: ["bark"],
@@ -314,7 +314,7 @@ function collectNotifyTypes() {
     document.querySelectorAll('#notifyTypes input[type="checkbox"]:checked')
   ).map((input) => input.value);
 
-  return selected.length ? selected : ["bark"];
+  return selected;
 }
 
 function readFormState() {
@@ -471,7 +471,7 @@ function buildConfigObject(state) {
   const configObject = {
     CONFIG_BIN_KEY: state.configKey,
     CONFIG_BIN_ALLOW_LEGACY_LUA: Boolean(state.allowLegacyLua),
-    NOTIFY_TYPE: state.notifyTypes.length ? state.notifyTypes : ["bark"],
+    NOTIFY_TYPE: state.notifyTypes,
     QUERY_TRAFFIC_INTERVAL: state.queryTrafficInterval,
     BOOT_NOTIFY: state.bootNotify,
     BOOT_NOTIFY_SUFFIX: state.bootNotifySuffix,

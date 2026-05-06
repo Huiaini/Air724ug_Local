@@ -28,7 +28,7 @@ CONFIG_BIN_ALLOW_LEGACY_LUA = true
 
 -- 通知类型, 支持配置多个
 -- NOTIFY_TYPE = { "custom_post", "telegram", "pushdeer", "bark", "dingtalk", "feishu", "wecom", "pushover", "inotify", "next-smtp-proxy", "gotify", "serverchan" }
-NOTIFY_TYPE = { "bark" }
+NOTIFY_TYPE = {}
 
 -- custom_post 通知配置, 自定义 POST 请求
 -- CUSTOM_POST_CONTENT_TYPE 支持 application/x-www-form-urlencoded 和 application/json
@@ -46,7 +46,7 @@ NOTIFY_TYPE = { "bark" }
 -- PUSHDEER_KEY = ""
 
 -- bark 通知配置, https://github.com/Finb/Bark
-BARK_API = "https://api.day.app"
+BARK_API = ""
 -- 请填写你自己的 Bark key
 BARK_KEY = ""
 

@@ -27,12 +27,14 @@
   "config": {
     "CONFIG_BIN_KEY": "jocry",
     "CONFIG_BIN_ALLOW_LEGACY_LUA": true,
-    "NOTIFY_TYPE": ["bark"]
+    "NOTIFY_TYPE": []
   }
 }
 ```
 
 设备端会先尝试 JSON 解析，再按白名单把字段写入 `config` 模块。
+
+默认不启用任何通知渠道。需要 Bark 时，在页面里手动勾选 `Bark` 并填写 Bark API 和 Key。
 
 ### 兼容模式：Legacy Lua
 
@@ -108,7 +110,7 @@ node cloudflare-config-generator/smoke-test.js
 
 - JSON 安全配置模式可正常导出并按兼容算法解回原文
 - Legacy Lua 模式仍可正常导出旧格式脚本
-- `NUMBER`、通知类型、自定义 POST body 等关键字段会正确进入载荷
+- 默认通知类型为空，手动选择的通知类型、自定义 POST body 等关键字段会正确进入载荷
 
 ## 交付建议
 

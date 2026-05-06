@@ -152,7 +152,7 @@ function createHarness() {
 
   const notifyInputs = NOTIFY_TYPES.map((value) => ({
     value,
-    checked: value === "bark",
+    checked: false,
     addEventListener() {},
     closest() {
       return null;
@@ -258,6 +258,21 @@ function decryptConfigBin(base64, compatKey) {
   return raw.toString("utf8").replace(/\x00+$/g, "");
 }
 
+function runDefaultNotifyTest() {
+  const { api } = createHarness();
+
+  const preview = api.renderPreview();
+  const payload = JSON.parse(preview.payloadText);
+
+  assert.deepEqual(payload.config.NOTIFY_TYPE, []);
+  assert.equal(Object.prototype.hasOwnProperty.call(payload.config, "BARK_API"), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(payload.config, "BARK_KEY"), false);
+
+  return {
+    notifyTypes: payload.config.NOTIFY_TYPE,
+  };
+}
+
 function runJsonModeTest() {
   const { api, elements, notifyInputs } = createHarness();
 
@@ -340,6 +355,7 @@ function runLegacyModeTest() {
   };
 }
 
+const defaultResult = runDefaultNotifyTest();
 const jsonResult = runJsonModeTest();
 const legacyResult = runLegacyModeTest();
 
@@ -347,6 +363,7 @@ console.log(
   JSON.stringify(
     {
       ok: true,
+      default: defaultResult,
       json: jsonResult,
       legacy: legacyResult,
     },
