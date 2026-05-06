@@ -96,13 +96,13 @@ powershell -ExecutionPolicy Bypass -File .\cloudflare-config-generator\deploy-pa
 
 当前发布版本：
 
-- [v2026.04.24](https://github.com/Huiaini/Air724ug_Local/releases/tag/v2026.04.24)
+- [v2026.05.06](https://github.com/Huiaini/Air724ug_Local/releases/tag/v2026.05.06)
 
 直接下载：
 
-- [cloudflare-config-generator.zip](https://github.com/Huiaini/Air724ug_Local/releases/download/v2026.04.24/cloudflare-config-generator.zip)
-- [script.zip](https://github.com/Huiaini/Air724ug_Local/releases/download/v2026.04.24/script.zip)
-- [driver.zip](https://github.com/Huiaini/Air724ug_Local/releases/download/v2026.04.24/driver.zip)
+- [cloudflare-config-generator.zip](https://github.com/Huiaini/Air724ug_Local/releases/download/v2026.05.06/cloudflare-config-generator.zip)
+- [script.zip](https://github.com/Huiaini/Air724ug_Local/releases/download/v2026.05.06/script.zip)
+- [driver.zip](https://github.com/Huiaini/Air724ug_Local/releases/download/v2026.05.06/driver.zip)
 
 ## 本地自检
 
